@@ -12,71 +12,64 @@
  * Implementation of hook_block()
  */
 function vcp_block($op = 'list', $delta = 0, $edit = array()) {
-  $str_vidnum = 'vcp_block_conf_pending_vids_num';
-  $str_webdir = 'vcp_block_conf_pending_vids_webdir';
-  
-  switch( $op ) {
-    case 'list':
-      $blocks[0]['info'] = t('VCP Pending Videos');
-      $blocks[0]['cache'] = BLOCK_NO_CACHE;
-    return $blocks;
+    $str_vidnum = 'vcp_block_conf_pending_vids_num';
+    $str_webdir = 'vcp_block_conf_pending_vids_webdir';
 
-    case 'configure':
-      $form[$str_vidnum] = array(
-        '#type' => 'textfield',
-        '#title' => t('Number of pending videos to display'),
-        '#default_value' => 
-          variable_get($str_vidnum,5),
-      );
-      $form[$str_webdir] = array(
-        '#type' => 'textfield',
-        '#title' => 
-          t('Folder where web documents are stored. (e.g. "htdocs")'),
-        '#default_value' => variable_get($str_webdir, 'htdocs'),
-      );
-    return $form;
+    switch( $op ) {
+        case 'list':
+            $blocks[0]['info'] = t('VCP Pending Videos');
+            $blocks[0]['cache'] = BLOCK_NO_CACHE;
+            return $blocks;
 
-    case 'save':
-      variable_set( $str_vidnum, (int)$edit[$str_vidnum] );
-      variable_set( $str_webdir, (string)$edit[$str_webdir] );
-    break;
+        case 'configure':
+            $form[$str_vidnum] = array(
+                    '#type' => 'textfield',
+                    '#title' => t('Number of pending videos to display'),
+                    '#default_value' => 
+                    variable_get($str_vidnum,5),
+                    );
+            $form[$str_webdir] = array(
+                    '#type' => 'textfield',
+                    '#title' => 
+                    t('Folder where web documents are stored. (e.g. "htdocs")'),
+                    '#default_value' => variable_get($str_webdir, 'htdocs'),
+                    );
+            return $form;
 
-    case 'view':  
-      $content = "";
-      $count = 0;
-      $num_to_list = (int)variable_get( $str_vidnum, '-1' );
+        case 'save':
+            variable_set( $str_vidnum, (int)$edit[$str_vidnum] );
+            variable_set( $str_webdir, (string)$edit[$str_webdir] );
+            break;
 
-      $block['subject'] = t('Pending Videos');
-     
-      $webdir = variable_get( $str_webdir, '---' );
+        case 'view':  
+            $content = "";
+            $count = 0;
+            $num_to_list = (int)variable_get( $str_vidnum, '-1' );
 
-      if( $webdir === '---' || $num_to_list === -1 ) {
-        $block['content'] = 
-          t('There were some errors in your block config. Please check the block settings.');
-        return $block;
-      }
+            $block['subject'] = t('Pending Videos');
 
-      $d = getcwd();
-      $d = explode($webdir, $d);
-      $d = $d[0] . "videos/pending/";
+            $webdir = variable_get( $str_webdir, '---' );
 
-      if( ($dirHandle = @opendir($d)) !== false) {
-        $content = Array();
-        while( ($file = readdir($dirHandle)) !== false 
-                && 
-                $count < $num_to_list
-        ) {
-          if( $file !== '.' && $file !== '..' ) {
-            $content[] = $file;
-            $count++;
-          }
-        }
-      } else {
-        $content = t('Could not find videos/pending directory.');
+            if( $webdir === '---' || $num_to_list === -1 ) {
+                $block['content'] = 
+                    t('There were some errors in your block config. Please check the block settings.');
+                return $block;
+            }
+
+            $d = getcwd();
+            $d = explode($webdir, $d);
+            $d = $d[0] . "videos/pending/";
+
+            $files = file_scan_directory( $d, '.*');
+
+            foreach( $files as $file ) {
+                if( $count == $num_to_list ) break; 
+                $content[] = $file->basename;
+                $count++;
+            }
+
+            $block['content'] = theme('item_list', $content);
+            return $block;
     }
-
-    $block['content'] = theme('item_list', $content);
-    return $block;
-  }
 }
 
