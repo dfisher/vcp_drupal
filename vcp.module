@@ -2,10 +2,43 @@
 // $Id$
 /**
  * @file
- * Provides a number of VCP-related report blocks.
+ * Provides various VCP-related functionality.
  * 
- * Adds a number of blocks for project admins to view the current state
- * of their projects, etc.
+ * Adds facilities for keeping track of video scores as well as adding
+ * VCP-specific blocks, theming, and pages.
  */
 
+/*
+ * Implementation of hook_block()
+ */
+function vcp_block($op = 'list', $delta = 0, $edit = array()) {
+  switch( $op ) {
+    case 'list':
+      $blocks[0]['info'] = t('VCP Pending Videos');
+      $blocks[0]['cache'] = BLOCK_NO_CACHE;
+    return $blocks;
+
+    case 'configure':
+      $form['vcp_block_conf_pending_vids_num'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Number of pending videos to display.'),
+        '#default_value' => 
+          variable_get('vcp_block_conf_pending_vids_num',5),
+        );
+    return $form;
+
+    case 'save':
+      variable_set(
+        'vcp_block_conf_pending_vids_num',
+        (int)$edit['vcp_block_conf_pending_vids_num'
+      );
+    break;
+
+    case 'view':
+      $items = $user->roles;
+      $block['subject'] = t('Pending Videos');
+      $block['content'] = theme('item_list', $items);
+    return $block;
+  }
+}
 
