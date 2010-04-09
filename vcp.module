@@ -30,7 +30,7 @@ function vcp_block($op = 'list', $delta = 0, $edit = array()) {
     case 'save':
       variable_set(
         'vcp_block_conf_pending_vids_num',
-        (int)$edit['vcp_block_conf_pending_vids_num'
+        (int)$edit['vcp_block_conf_pending_vids_num']
       );
     break;
 
