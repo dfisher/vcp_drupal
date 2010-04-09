@@ -37,7 +37,7 @@ function vcp_block($op = 'list', $delta = 0, $edit = array()) {
     case 'view':
       $items = $user->roles;
       $block['subject'] = t('Pending Videos');
-      $block['content'] = theme('item_list', $items);
+      $block['content'] = theme( 'item_list', array('Hello', 'World') ); 
     return $block;
   }
 }
