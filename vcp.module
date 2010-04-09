@@ -12,6 +12,9 @@
  * Implementation of hook_block()
  */
 function vcp_block($op = 'list', $delta = 0, $edit = array()) {
+  $str_vidnum = 'vcp_block_conf_pending_vids_num';
+  $str_webdir = 'vcp_block_conf_pending_vids_webdir';
+  
   switch( $op ) {
     case 'list':
       $blocks[0]['info'] = t('VCP Pending Videos');
@@ -19,25 +22,60 @@ function vcp_block($op = 'list', $delta = 0, $edit = array()) {
     return $blocks;
 
     case 'configure':
-      $form['vcp_block_conf_pending_vids_num'] = array(
+      $form[$str_vidnum] = array(
         '#type' => 'textfield',
-        '#title' => t('Number of pending videos to display.'),
+        '#title' => t('Number of pending videos to display'),
         '#default_value' => 
-          variable_get('vcp_block_conf_pending_vids_num',5),
-        );
+          variable_get($str_vidnum,5),
+      );
+      $form[$str_webdir] = array(
+        '#type' => 'textfield',
+        '#title' => 
+          t('Folder where web documents are stored. (e.g. "htdocs")'),
+        '#default_value' => variable_get($str_webdir, 'htdocs'),
+      );
     return $form;
 
     case 'save':
-      variable_set(
-        'vcp_block_conf_pending_vids_num',
-        (int)$edit['vcp_block_conf_pending_vids_num']
-      );
+      variable_set( $str_vidnum, (int)$edit[$str_vidnum] );
+      variable_set( $str_webdir, (string)$edit[$str_webdir] );
     break;
 
-    case 'view':
-      $items = $user->roles;
+    case 'view':  
+      $content = "";
+      $count = 0;
+      $num_to_list = (int)variable_get( $str_vidnum, '-1' );
+
       $block['subject'] = t('Pending Videos');
-      $block['content'] = theme( 'item_list', array('Hello', 'World') ); 
+     
+      $webdir = variable_get( $str_webdir, '---' );
+
+      if( $webdir === '---' || $num_to_list === -1 ) {
+        $block['content'] = 
+          t('There were some errors in your block config. Please check the block settings.');
+        return $block;
+      }
+
+      $d = getcwd();
+      $d = explode($webdir, $d);
+      $d = $d[0] . "videos/pending/";
+
+      if( ($dirHandle = @opendir($d)) !== false) {
+        $content = Array();
+        while( ($file = readdir($dirHandle)) !== false 
+                && 
+                $count < $num_to_list
+        ) {
+          if( $file !== '.' && $file !== '..' ) {
+            $content[] = $file;
+            $count++;
+          }
+        }
+      } else {
+        $content = t('Could not find videos/pending directory.');
+    }
+
+    $block['content'] = theme('item_list', $content);
     return $block;
   }
 }
