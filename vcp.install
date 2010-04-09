@@ -6,6 +6,8 @@
  */
 function vcp_install() {
     drupal_install_schema('vcp');
+    variable_set( 'vcp_block_conf_pending_vids_num', 5);
+    variable_set( 'vcp_block_conf_pending_vids_webdir', 'htdocs');
 }
 
 /**
@@ -13,7 +15,8 @@ function vcp_install() {
  */
 function vcp_uninstall() {
     drupal_uninstall_schema('vcp');
-    // variable_delete('vcp_score_values');
+    variable_del( 'vcp_block_conf_pending_vids_num' );
+    variable_del( 'vcp_block_conf_pending_vids_webdir' );
 }
 
 /**
