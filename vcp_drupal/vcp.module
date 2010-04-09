@@ -1,0 +1,11 @@
+<?php
+// $Id$
+/**
+ * @file
+ * Provides a number of VCP-related report blocks.
+ * 
+ * Adds a number of blocks for project admins to view the current state
+ * of their projects, etc.
+ */
+
+

@@ -1,0 +1,77 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_install()
+ */
+function vcp_install() {
+    drupal_install_schema('vcp');
+}
+
+/**
+ * Implementation of hook_uninstall();
+ */
+function vcp_uninstall() {
+    drupal_uninstall_schema('vcp');
+    // variable_delete('vcp_score_values');
+}
+
+/**
+ * Implementation of hook_schema();
+ */
+function vcp_schema() {
+    $schema['vcp_scores'] = array(
+        'description' => t('Stores score values that scorers give to video segments.'),
+        'fields' => array(
+            'score_id' => array(
+                'type' => 'int',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+                'auto increment' => TRUE,
+            ),
+            'video_id' => array(
+                'type' => 'int',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+                'default' => 0,
+                'description' => t('The node id of the video to which the score applies.'),
+            ),
+            'uid' => array(
+                'type' => 'int',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+                'default' => 0,
+                'description' => t('The {user}.uid of the user/scorer who scored the segment.'),
+            ),
+            'segment_number' => array(
+                'type' => 'int',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+                'default' => 0,
+                'description' => t('The segment number to which the score applies.'),
+            ),
+            'parameter_id' => array(
+                'type' => 'int',
+                'unsigned' => TRUE,
+                'not null' => TRUE,
+                'default' => 0,
+                'description' => t('The {node}.nid of the question/parameter to which the score applies.'),
+            ),
+            'value' => array(
+                'type' => 'int',
+                'unsigned' => FALSE,
+                'not null' => TRUE,
+                'default' => -1,
+                description => t('The actual score the scorer assigned for a parameter in a segment of a video.'),
+            ),
+        ), // end fields array
+        'primary key' => array(
+           'score_id' 
+        ),
+        'indexes'=> array(
+            'vcp_scores_cpi' => array( 'video_id', 'uid', 'segment_number', 'parameter_id' ),
+        ),
+    );
+
+    return $schema;
+}

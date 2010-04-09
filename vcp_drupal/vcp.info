@@ -1,0 +1,7 @@
+; $Id$
+name = VCP
+description =  Provides VCP-specific settings and functions.
+core = 6.x
+dependencies[] = taxonomy
+dependencies[] = cck
+package = vcp
