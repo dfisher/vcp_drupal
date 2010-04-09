@@ -64,7 +64,11 @@ function vcp_block($op = 'list', $delta = 0, $edit = array()) {
 
             foreach( $files as $file ) {
                 if( $count == $num_to_list ) break; 
-                $content[] = $file->basename;
+                
+                $content[$count] = $file->basename;
+                if( strlen($content[$count]) > 20 ) {
+                    $content[$count] = substr( $content[$count], 0, 20 ) . "&#133;";
+                }
                 $count++;
             }
 
