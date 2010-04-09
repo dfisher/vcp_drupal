@@ -3,5 +3,5 @@ name = VCP
 description =  Provides VCP-specific settings and functions.
 core = 6.x
 dependencies[] = taxonomy
-dependencies[] = cck
+dependencies[] = content
 package = vcp
